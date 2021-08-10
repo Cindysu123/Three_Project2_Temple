@@ -14,18 +14,20 @@ let t = clock.getElapsedTime();
 
 const canvas = document.querySelector('.webgl')
 const scene = new THREE.Scene()
-scene.background = new THREE.Color(0xffffff)
-const light = new THREE.AmbientLight( 0xffffff, .5 ); // soft white light
+scene.background = new THREE.Color(0xe5fbee)
+scene.fog = new THREE.FogExp2(0xe5fbee, 0.01);
+
+const light = new THREE.AmbientLight( 0xd2f6fa, 1 ); // soft white light
 scene.add( light );
-const pointLight = new THREE.PointLight( 0xc7dbff,1 );
+const pointLight = new THREE.PointLight( 0xc7dbff,.01 );
 pointLight.position.set( -7, 15, 8 );
 scene.add( pointLight );
-  const lightHelper = new THREE.PointLightHelper(pointLight)
-//   scene.add(lightHelper)
-// const pointLight2 = new THREE.PointLight( 0x2600ff, 20, 10 );
-// light.position.set( 5, 0, 0 );
-// scene.add( pointLight2 );
-const directionalLight2 = new THREE.DirectionalLight(0x0091ff,3);
+// //   const lightHelper = new THREE.PointLightHelper(pointLight)
+// //   scene.add(lightHelper)
+// // const pointLight2 = new THREE.PointLight( 0x2600ff, 20, 10 );
+// // light.position.set( 5, 0, 0 );
+// // scene.add( pointLight2 );
+const directionalLight2 = new THREE.DirectionalLight(0x0091ff,.3);
 directionalLight2.position.set(0,-7,0)
 directionalLight2.castShasow = true;
 scene.add(directionalLight2);
@@ -98,6 +100,22 @@ function animate(){
             fishArr[i].position.z = z*4-4;
         }
     }
+
+    //raining
+    for (var i = 0; i<rain.length; i++){
+      var speed = (Math.random() * (10 - 1) + 1).toFixed(2)
+      if(rain[i]){
+        rain[i].position.y -= 0.05 * speed
+      }
+    }
+    for (var i = 0; i<rain.length; i++){
+      const [x, y, z] = Array(3).fill().map(()=>THREE.MathUtils.randFloatSpread(100))
+      if(rain[i] && rain[i].position.y < 5){
+        rain[i].position.x = x+20
+        rain[i].position.y = 40+y
+        rain[i].position.z = z
+      }
+  }
     renderer.render(scene, camera)
 }
 var color = 2
@@ -183,8 +201,8 @@ function addRock(){
     gltf => {
         rock = gltf.scene
         rock.scale.set(.05,.05,.05)
-        rock.position.set(12,7,0)
-        rock.rotation.y += -Math.PI/4;
+        rock.position.set(0,8,48)
+        rock.rotation.y = Math.PI/6;
       scene.add(rock);
     }
   )
@@ -198,8 +216,21 @@ function addBridge(){
         bridge = gltf.scene
         bridge.scale.set(.01,.01,.01)
         bridge.position.set(10,0,0)
-        // rock.rotation.y += Math.PI;
       scene.add(bridge);
+    }
+  )
+}
+let building
+function addBuilding(){
+  theLoader = new GLTFLoader()
+  theLoader.load(
+    './model/tingzi.gltf',
+    gltf => {
+      building = gltf.scene
+      building.scale.set(.06,.06,.06)
+      building.position.set(-5,6,40)
+      building.rotation.y = -Math.PI/2
+      scene.add(building);
     }
   )
 }
@@ -212,11 +243,26 @@ function addGrass(){
         grass = gltf.scene
         grass.scale.set(.05,.05,.05)
         grass.position.set(-10,10,-13)
-        // rock.rotation.y += Math.PI;
       scene.add(grass);
     }
   )
 }
+
+let grass2
+function addGrass2(){
+  theLoader = new GLTFLoader()
+  theLoader.load(
+    './model/grass.gltf',
+    gltf => {
+        grass2 = gltf.scene
+        grass2.scale.set(.06,.06,.06)
+        grass2.position.set(20,10,13)
+        grass2.rotation.y += Math.PI;
+      scene.add(grass2);
+    }
+  )
+}
+
 let flower2
 let flowerMixer2
 function addFlower2(){
@@ -234,7 +280,7 @@ function addFlower2(){
   )
 }
 
-const geometry = new THREE.BoxGeometry( 50, 35, 2 );
+const geometry = new THREE.BoxGeometry( 90, 35, 2 );
 const material = new THREE.MeshPhongMaterial({
     color: 0x8cffab,
     opacity: 0.2,
@@ -243,6 +289,7 @@ const material = new THREE.MeshPhongMaterial({
 const plane = new THREE.Mesh( geometry, material );
 plane.rotation.x += Math.PI/2;
 plane.position.y  = 5;
+plane.position.x  = -20;
 scene.add( plane );
 const geometry2 = new THREE.BoxGeometry( 50, 70, 2 );
 const material2 = new THREE.MeshPhongMaterial({
@@ -254,11 +301,26 @@ plane2.position.z  = -50;
 plane2.position.y  = 5;
 scene.add( plane2 );
 
-const plane3 = new THREE.Mesh( geometry2, material2 );
-plane3.rotation.x += Math.PI/2;
-plane3.position.x  = 50;
-plane3.position.y  = 5;
-scene.add( plane3 );
+
+const plane4 = new THREE.Mesh( geometry2, material2 );
+plane4.rotation.x += Math.PI/2;
+plane4.rotation.z += Math.PI/2;
+plane4.position.z  = 40;
+plane4.position.y  = 5;
+scene.add( plane4 );
+
+var rain = new Array
+for (var i = 0; i < 1000; i++){
+  const geometry = new THREE.BoxGeometry( .1, .2, .1 );
+  const material = new THREE.MeshPhongMaterial({
+    color: 0xe5efe7,
+  });
+  const plane = new THREE.Mesh( geometry, material );
+  const [x, y, z] = Array(3).fill().map(()=>THREE.MathUtils.randFloatSpread(100))
+  plane.position.set(x+20,-39,z-30)
+  rain[i] = plane;
+  scene.add( plane );
+}
 
 let num = 6
 for(var i = 0; i < num; i++){
@@ -270,7 +332,9 @@ addFlower()
 addRock()
 addFlower2()
 addBridge()
+addBuilding()
 addGrass()
+addGrass2()
 // addWater()
 
 var flag = true;
@@ -279,19 +343,19 @@ var title = document.querySelector("#title")
 btn.addEventListener("click", function(){
     if(flag){
         colorToScene(scene, 0x050124);
+        colorToFog(scene.fog, 0x050124)
         light.intensity = 0.001;
         pointLight.intensity = 1.5
         colorToLight(pointLight, 0xf7a820)
         title.style.color = "white";
-        title.innerHTML = "That can change color"
         flag = false;
     } else {
-        colorToScene(scene, 0xffffff);
+        colorToScene(scene, 0xd2f6fa);
+        colorToFog(scene.fog, 0xd2f6fa)
         light.intensity = 0.5;
-        pointLight.intensity = 1
+        pointLight.intensity = 2
         colorToLight(pointLight, 0xc7dbff)
         title.style.color = "black";
-        title.innerHTML = "THIS IS A SCENE"
         flag = true;
     }
 })
