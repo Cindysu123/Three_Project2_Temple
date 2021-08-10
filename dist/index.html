@@ -5,9 +5,36 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Three.js Project1</title>
+    <style>
+        body {
+        overflow-x: hidden;
+        overflow-y: scroll;
+        padding: 0;
+        margin: 0;
+      }
+      #bg {
+          position: fixed;
+          margin: 0;
+          padding: 0;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: -999;
+        }
+        #title {
+            margin-top: 100px;
+            text-align: center;
+        }
+        #btn {
+            margin-left: 600px;
+        }
+    </style>
 </head>
 <body>
-    <canvas class="webgl"></canvas>
+    <canvas class="webgl" id="bg"></canvas>
+    <h1 id="title">THIS IS A SCENE</h1>
+    <button id="btn">click me</button>
     <script type="module" src="index.js"></script>
 </body>
 </html>
